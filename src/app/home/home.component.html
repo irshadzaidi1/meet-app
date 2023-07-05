@@ -1,0 +1,19 @@
+<div class="home-conatainer">
+    <h2>Video calls and meetings for everyone.</h2>
+    <div class="action-container">
+        <button class="open-usermedia-btn" (click)="openUserMedia()">Open Camera & Mic</button>
+        <button class="new-meeting-btn" (click)="createRoom()">New Meeting</button>
+        <input class="join-meeting-input" type="text" placeholder="Enter meeting code"/>
+        <button class="hangup-btn" (click)="hangUp()">Hang Up</button>
+    </div>
+    <div class="videos-container">
+        <div>
+            <p>Local Stream</p>
+            <video class="local-video" muted autoplay playsinline [srcObject]="localStream"></video>
+        </div>
+        <div>
+            <p>Remote Stream</p>
+            <video class="remote-video" autoplay playsinline></video>
+        </div>
+    </div>
+</div>

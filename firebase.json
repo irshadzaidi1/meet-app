@@ -1,0 +1,9 @@
+{
+  "hosting": [
+    {
+      "target": "meet-app",
+      "source": ".",
+      "frameworksBackend": {}
+    }
+  ]
+}

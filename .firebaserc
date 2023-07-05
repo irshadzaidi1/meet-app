@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "meet-app-98085": {
+      "hosting": {
+        "meet-app": [
+          "meet-app-98085"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "meet-app-98085"
+  }
+}
