@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Firestore, collectionData, collection, onSnapshot, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection, onSnapshot, doc, setDoc, addDoc, getDoc, docData, updateDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 
@@ -30,38 +30,75 @@ export class HomeComponent implements OnInit {
   remoteStream: any;
   peerConnection: any;
   roomId: any;
+  meetingId: any;
 
   constructor() {
     const itemCollection = collection(this.firestore, 'rooms');
     this.item$ = collectionData(itemCollection);
   }
 
-  // async joinRoomById(roomId: any) {
-  //   const db = firebase.firestore();
-  //   const roomRef = db.collection('rooms').doc(`${roomId}`);
-  //   const roomSnapshot = await roomRef.get();
-  //   console.log('Got room:', roomSnapshot.exists);
+  joinRoomById = async (roomId: any) => {
+    const roomRef = doc(collection(this.firestore, 'rooms'), roomId);
+    const roomSnapshot = await getDoc(roomRef);
+    alert(`Is room exists? ${roomSnapshot.exists()}`);
   
-  //   if (roomSnapshot.exists) {
-  //     this.peerConnection = new RTCPeerConnection(this.configuration);
-  //     this.registerPeerConnectionListeners();
-  //     this.localStream.getTracks().forEach((track: any) => {
-  //       this.peerConnection.addTrack(track, this.localStream);
-  //     });
+    if (roomSnapshot.exists()) {
+      this.peerConnection = new RTCPeerConnection(this.configuration);
+      this.registerPeerConnectionListeners();
+      this.localStream.getTracks().forEach((track: any) => {
+        console.log(this.localStream, track, this.peerConnection, "++++++");
+        this.peerConnection.addTrack(track, this.localStream);
+      });
   
-  //     // Code for collecting ICE candidates below
-  //     this.collectIceCandidates(roomRef, this.peerConnection,'localName', 'remoteName')
-  //     // Code for collecting ICE candidates above
+      // Code for collecting ICE candidates below
+      const calleeCandidatesCollection = collection(roomRef, ('calleeCandidates'));
+      this.peerConnection.addEventListener('icecandidate', (event: any) => {
+        if (!event.candidate) {
+          console.log('Got final candidate!');
+          return;
+        }
+        addDoc(calleeCandidatesCollection, event.candidate.toJSON());
+      });
+      // Code for collecting ICE candidates above
   
-  //     this.peerConnection.addEventListener('track', (event: any) => {
-  //       console.log('Got remote track:', event.streams[0]);
-  //       event.streams[0].getTracks().forEach((track: any) => {
-  //         console.log('Add a track to the remoteStream:', track);
-  //         this.remoteStream.addTrack(track);
-  //       });
-  //     });
-  //   }
-  // }
+      this.peerConnection.addEventListener('track', (event: any) => {
+        console.log('Got remote track:', event.streams[0]);
+        event.streams[0].getTracks().forEach((track: any) => {
+          console.log('Add a track to the remoteStream:', track);
+          this.remoteStream.addTrack(track);
+        });
+      });
+  
+      // Code for creating SDP answer below
+      const offer = roomSnapshot.data()['offer'];
+      console.log('Got offer:', offer);
+      await this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await this.peerConnection.createAnswer();
+      console.log('Created answer:', answer);
+      await this.peerConnection.setLocalDescription(answer);
+  
+      const roomWithAnswer = {
+        answer: {
+          type: answer.type,
+          sdp: answer.sdp,
+        },
+      };
+      await updateDoc(roomRef, roomWithAnswer);
+      // Code for creating SDP answer above
+  
+      // Listening for remote ICE candidates below
+      onSnapshot(collection(roomRef, 'callerCandidates'),(snapshot: any) => {
+        snapshot.docChanges().forEach(async (change: any) => {
+          if (change.type === 'added') {
+            let data = change.doc.data();
+            console.log(`Got new remote ICE candidate: ${JSON.stringify(data)}`);
+            await this.peerConnection.addIceCandidate(new RTCIceCandidate(data));
+          }
+        });
+      });
+      // Listening for remote ICE candidates above
+    }
+  }
 
   async collectIceCandidates(roomRef: any, peerConnection: any, localName: any, remoteName: any) {
     const candidatesCollection = roomRef.collection(localName);
@@ -134,35 +171,43 @@ export class HomeComponent implements OnInit {
     document.location.reload();
   }
 
-  async createRoom() {
+  createRoom = async () => {
+    const roomRef = await doc(collection(this.firestore, "rooms"));
     this.peerConnection = new RTCPeerConnection(this.configuration);
     this.registerPeerConnectionListeners();
-    const offer = await this.peerConnection.createOffer();
-    await this.peerConnection.setLocalDescription(offer);
-    const roomWithOffer = {
-        offer: {
-            type: offer.type,
-            sdp: offer.sdp
-        }
-    }
-    const roomRef = doc(collection(this.firestore, "rooms"));
-    await setDoc(roomRef, roomWithOffer);
-    this.roomId = roomRef.id;
-    onSnapshot(collection(this.firestore, "rooms"), {}, async (snapshot: any) => {
-      const data: any = [];
-      snapshot.docs.forEach((doc: any) => {
-        data.push(doc.data());
-      });
-      if (!this.peerConnection.currentRemoteDescription && snapshot.answer) {
-          console.log('Set remote description: ', data.answer);
-          const answer = new RTCSessionDescription(data.answer)
-          await this.peerConnection.setRemoteDescription(answer);
-      }
-    });
-    
+  
     this.localStream.getTracks().forEach((track: any) => {
+      console.log(this.peerConnection, track, "_+");
       this.peerConnection.addTrack(track, this.localStream);
     });
+  
+    // Code for collecting ICE candidates below
+    const callerCandidatesCollection = collection(roomRef, "callerCandidates");
+  
+    this.peerConnection.addEventListener('icecandidate', (event: any) => {
+      if (!event.candidate) {
+        console.log('Got final candidate!');
+        return;
+      }
+      console.log('Got candidate: ', event.candidate);
+      addDoc(callerCandidatesCollection, event.candidate.toJSON());
+    });
+    // Code for collecting ICE candidates above
+  
+    // Code for creating a room below
+    const offer = await this.peerConnection.createOffer();
+    await this.peerConnection.setLocalDescription(offer);
+    console.log('Created offer:', offer);
+  
+    const roomWithOffer = {
+      'offer': {
+        type: offer.type,
+        sdp: offer.sdp,
+      },
+    };
+    await setDoc(roomRef, roomWithOffer)
+    this.roomId = roomRef.id;
+    alert(`RoomID: ${roomRef.id}`);
   
     this.peerConnection.addEventListener('track', (event: any) => {
       console.log('Got remote track:', event.streams[0]);
@@ -171,6 +216,29 @@ export class HomeComponent implements OnInit {
         this.remoteStream.addTrack(track);
       });
     });
+  
+    // Listening for remote session description below
+    onSnapshot(roomRef, async (snapshot: any) => {
+      const data = snapshot.data();
+      if (!this.peerConnection.currentRemoteDescription && data && data.answer) {
+        console.log('Got remote description: ', data.answer);
+        const rtcSessionDescription = new RTCSessionDescription(data.answer);
+        await this.peerConnection.setRemoteDescription(rtcSessionDescription);
+      }
+    });
+    // Listening for remote session description above
+  
+    // Listen for remote ICE candidates below
+    onSnapshot(collection(roomRef, 'calleeCandidates'), (snapshot => {
+      snapshot.docChanges().forEach(async change => {
+        if (change.type === 'added') {
+          let data = change.doc.data();
+          console.log(`Got new remote ICE candidate: ${JSON.stringify(data)}`);
+          await this.peerConnection.addIceCandidate(new RTCIceCandidate(data));
+        }
+      });
+    }));
+    // Listen for remote ICE candidates above
   }
 
   registerPeerConnectionListeners() {
@@ -191,6 +259,10 @@ export class HomeComponent implements OnInit {
       console.log(
           `ICE connection state change: ${this.peerConnection.iceConnectionState}`);
     });
+  }
+
+  handleMeetingCodeChange(evt: any) {
+    this.meetingId = evt.target.value;
   }
 
   ngOnInit(): void {
