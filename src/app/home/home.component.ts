@@ -124,16 +124,7 @@ export class HomeComponent implements OnInit {
       video: true, audio: true
     });
     this.localStream = stream;
-    // document.querySelector('#localVideo').srcObject = stream;
-    // localStream = stream;
-    // remoteStream = new MediaStream();
-    // document.querySelector('#remoteVideo').srcObject = remoteStream;
-
-    // console.log('Stream:', document.querySelector('#localVideo').srcObject);
-    // document.querySelector('#cameraBtn').disabled = true;
-    // document.querySelector('#joinBtn').disabled = false;
-    // document.querySelector('#createBtn').disabled = false;
-    // document.querySelector('#hangupBtn').disabled = false;
+    this.remoteStream = new MediaStream();
   }
 
   async hangUp() {
