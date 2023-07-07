@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { Firestore, collectionData, collection, onSnapshot, doc, setDoc, addDoc, getDoc, docData, updateDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
 export class HomeComponent implements OnInit {
   item$?: Observable<any[]>;
   firestore: Firestore = inject(Firestore);
+  isMuted: boolean = false;
 
   // DEfault configuration - Change these if you have a different STUN or TURN server.
   configuration = {
@@ -62,7 +63,7 @@ export class HomeComponent implements OnInit {
       // Code for collecting ICE candidates above
   
       this.peerConnection.addEventListener('track', (event: any) => {
-        console.log('Got remote track:', event.streams[0]);
+        console.log('Got remote track:', event.streams[0], event.streams);
         event.streams[0].getTracks().forEach((track: any) => {
           console.log('Add a track to the remoteStream:', track);
           this.remoteStream.addTrack(track);

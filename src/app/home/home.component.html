@@ -10,11 +10,17 @@
     <div class="videos-container">
         <div>
             <p>Local Stream</p>
-            <video class="local-video" muted autoplay playsinline [srcObject]="localStream"></video>
+            <video [muted]="isMuted" class="local-video" muted autoplay playsinline [srcObject]="localStream"></video>
+            <div>
+                <button (click)="isMuted = !isMuted">{{isMuted ? 'Unmute' : 'Mute'}}</button>
+            </div>
         </div>
         <div>
             <p>Remote Stream</p>
             <video class="remote-video" autoplay playsinline [srcObject]="remoteStream"></video>
+            <div>
+                <!-- <button>{{isMuted ? 'Unmute' : 'Mute'}}</button> -->
+            </div>
         </div>
     </div>
 </div>
