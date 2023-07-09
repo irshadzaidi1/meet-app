@@ -1,0 +1,63 @@
+<!-- <div class="home-conatainer">
+    <h2>Video calls and meetings for everyone.</h2>
+    <div class="action-container">
+        <button class="new-meeting-btn" (click)="createRoom()">New Meeting</button>
+        <input class="join-meeting-input" type="text" placeholder="Enter meeting code" (change)="handleMeetingCodeChange($event)" />
+        <button class="join-meeting-btn" (click)="joinRoomById(meetingId)">Join</button>
+        <button class="hangup-btn" (click)="leave()">Leave</button>
+    </div>
+    <div class="videos-container">
+        <div>
+            <p>Local Stream</p>
+            <video [muted]="isMuted" class="local-video" muted autoplay playsinline [srcObject]="localStream"></video>
+            <div>
+                <button (click)="isMuted = !isMuted">{{isMuted ? 'Unmute' : 'Mute'}}</button>
+            </div>
+        </div>
+        <div>
+            <p>Remote Stream</p>
+            <video class="remote-video" autoplay playsinline [srcObject]="remoteStream"></video>
+        </div>
+    </div>
+</div>
+ -->
+<div class="meet-panel-container">
+    <div class="video-container">
+        <video class="local-video" autoplay playsinline [srcObject]="localStream"></video>
+        <video class="remote-video" autoplay playsinline [srcObject]="remoteStream"></video>
+    </div>
+    <div class="action-container">
+        <div class="meet-info">
+            <button mat-fab color="white" [matMenuTriggerFor]="meetingInfoMenu" id="meetingInfoBtn">
+                <i class="fa-solid fa-circle-info fa-2xl" style="color: #000;"></i>
+            </button>
+        </div>
+        <div class="call-actions">
+            <button mat-fab color="white">
+                <i class="fa-solid fa-microphone fa-xl" style="color: #000;"></i>
+            </button>
+            <button mat-fab color="white">
+            <i class="fa-solid fa-video fa-xl" style="color: #000;"></i>
+        </button>
+        <button mat-fab color="white">
+            <i class="fa-solid fa-arrow-up-from-bracket fa-xl" style="color: #000;"></i>
+        </button>
+        <button mat-fab color="warn" (click)="leave()">
+            <i class="fa-solid fa-phone-slash fa-xl" style="color: fff;"></i>
+        </button>
+        </div>
+        <div class="members-info">
+            <button mat-fab color="white">
+                <i class="fa-solid fa-users fa-xl" style="color: #000;"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<mat-menu #meetingInfoMenu>
+    <menu mat-menu-item>
+        Meeting Link: <b>{{getMeetingLink}}</b><i class="fa-solid fa-copy fa-xl" style="margin-left: 16px; color: #000;" (click)="handleCopy(getMeetingLink)" matTooltip="Copy meeting link" matTooltipPosition="above"></i>
+    </menu>
+    <menu mat-menu-item>
+        Meeting Code: <b>{{meetingCode}}</b><i class="fa-solid fa-copy fa-xl" style="margin-left: 16px; color: #000;" (click)="handleCopy(meetingCode)" matTooltip="Copy meeting code" matTooltipPosition="above"></i>
+    </menu>
+</mat-menu>

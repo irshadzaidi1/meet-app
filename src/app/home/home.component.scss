@@ -1,36 +1,13 @@
-.home-conatainer {
-    text-align: center;
-}
-.action-container {
-    .open-usermedia-btn {
-        margin-right: 8px;
-    }
-    .new-meeting-btn {
-        margin-right: 8px;
-        margin-left: 8px;
-    }
-    .join-meeting-input {
-        margin-right: 8px;
-        margin-left: 8px;
-    }
-    .join-meeting-btn {
-        margin-right: 8px;
-        margin-left: 8px;
-    }
-    .hangup-btn {
-        margin-left: 8px;
-    }
-}
-.videos-container {
+.home-container {
     display: flex;
+    padding: 32px;
     justify-content: center;
-    div {
-        margin: 32px 8px;
+    .action-card {
+        width: 520px;
     }
-    .local-video,
-    .remote-video {
-        background: black;
-        width: 440px;
-        height: 330px;
+    .card-action-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 }

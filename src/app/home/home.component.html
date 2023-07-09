@@ -1,26 +1,22 @@
-<div class="home-conatainer">
-    <h2>Video calls and meetings for everyone.</h2>
-    <div class="action-container">
-        <button class="open-usermedia-btn" (click)="openUserMedia()">Open Camera & Mic</button>
-        <button class="new-meeting-btn" (click)="createRoom()">New Meeting</button>
-        <input class="join-meeting-input" type="text" placeholder="Enter meeting code" (change)="handleMeetingCodeChange($event)" />
-        <button class="join-meeting-btn" (click)="joinRoomById(meetingId)">Join</button>
-        <button class="hangup-btn" (click)="hangUp()">Hang Up</button>
-    </div>
-    <div class="videos-container">
-        <div>
-            <p>Local Stream</p>
-            <video [muted]="isMuted" class="local-video" muted autoplay playsinline [srcObject]="localStream"></video>
-            <div>
-                <button (click)="isMuted = !isMuted">{{isMuted ? 'Unmute' : 'Mute'}}</button>
-            </div>
-        </div>
-        <div>
-            <p>Remote Stream</p>
-            <video class="remote-video" autoplay playsinline [srcObject]="remoteStream"></video>
-            <div>
-                <!-- <button>{{isMuted ? 'Unmute' : 'Mute'}}</button> -->
-            </div>
-        </div>
-    </div>
+<div class="home-container">
+    <mat-card class="action-card">
+        <mat-card-header>
+          <mat-card-title><h1>Confrence App</h1></mat-card-title>
+          <mat-card-subtitle><h3>Video calls and meetings for everyone.</h3></mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image src="assets/images/video-call.svg" alt="video Call">
+        <mat-card-content>
+          <h3>Create new meeting or join with meeting code.</h3>
+        </mat-card-content>
+        <mat-card-actions class="card-action-wrapper">
+          <button mat-raised-button color="primary" [routerLink]="['/confrence']">Let's Start Meeting</button>
+          <h2 style="margin: 0 32px;">OR</h2>
+          <!-- <i class="afa-solid fa-grip-lines-vesrtical fas-2xl">OR</i> -->
+          <mat-form-field class="example-form-field">
+            <mat-label>Enter meeting code here ...</mat-label>
+            <input matInput type="text" [(ngModel)]="meetingCode">
+          </mat-form-field>
+          <button mat-button [disabled]="validMeetingCode" [routerLink]="['/confrence/' + meetingCode]">Join Meeting</button>
+        </mat-card-actions>
+      </mat-card>
 </div>

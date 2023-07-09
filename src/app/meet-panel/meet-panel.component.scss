@@ -1,0 +1,47 @@
+.meet-panel-container {
+    height: 100%;
+    .video-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 85%;
+        background-color: rgb(32,33,36);
+        .local-video,
+        .remote-video {
+            border: 2px solid #ccc;
+            height: 100%;
+        }
+    }
+    .action-container {
+        padding: 0 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 15%;
+        background: rgb(32,33,36);
+        .meet-info,
+        .members-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .meeting-info-menu {
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        .call-actions {
+            display: flex;
+            justify-content: space-between;
+            button {
+                margin: 0 24px;
+            }
+        }
+    }
+}
+
+::ng-deep {
+    &.mat-menu-panel {
+        max-width: none !important;
+    }
+}
