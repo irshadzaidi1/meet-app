@@ -24,7 +24,9 @@
 <div class="meet-panel-container">
     <div class="video-container">
         <video class="local-video" autoplay playsinline [srcObject]="localStream"></video>
-        <video class="remote-video" autoplay playsinline [srcObject]="remoteStream"></video>
+        <ng-container *ngFor="let stream of remoteStream">
+            <video class="remote-video" autoplay playsinline [srcObject]="stream"></video>
+        </ng-container>
     </div>
     <div class="action-container">
         <div class="meet-info">

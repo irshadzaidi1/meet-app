@@ -27,10 +27,10 @@ export class MeetPanelComponent implements OnInit {
         ],
       },
     ],
-    iceCandidatePoolSize: 10,
+    iceCandidatePoolSize: 20,
   };
   localStream: any;
-  remoteStream: any;
+  remoteStream: any = [];
   peerConnection: any;
   roomId: any;
   meetingId: any;
@@ -51,7 +51,6 @@ export class MeetPanelComponent implements OnInit {
       this.peerConnection = new RTCPeerConnection(this.configuration);
       this.registerPeerConnectionListeners();
       this.localStream.getTracks().forEach((track: any) => {
-        console.log(this.localStream, track, this.peerConnection, "++++++");
         this.peerConnection.addTrack(track, this.localStream);
       });
   
@@ -68,9 +67,16 @@ export class MeetPanelComponent implements OnInit {
   
       this.peerConnection.addEventListener('track', (event: any) => {
         console.log('Got remote track:', event.streams[0], event.streams);
-        event.streams[0].getTracks().forEach((track: any) => {
-          this.remoteStream.addTrack(track);
+        this.remoteStream = (event.streams || []).map((stream: any) => {
+          const rmStream = new MediaStream();
+          stream.getTracks().forEach((track: any) => {
+            rmStream.addTrack(track);
+          });
+          return rmStream;
         });
+        // event.streams[0].getTracks().forEach((track: any) => {
+        //   this.remoteStream.addTrack(track);
+        // });
       });
   
       // Code for creating SDP answer below
@@ -80,12 +86,14 @@ export class MeetPanelComponent implements OnInit {
       const answer = await this.peerConnection.createAnswer();
       console.log('Created answer:', answer);
       await this.peerConnection.setLocalDescription(answer);
+      const allAnswer = roomSnapshot.data()['answer'] || [];
+
   
       const roomWithAnswer = {
-        answer: {
-          type: answer.type,
-          sdp: answer.sdp,
-        },
+        answer: [
+          ...allAnswer,
+          { type: answer.type, sdp: answer.sdp }
+        ],
       };
       await updateDoc(roomRef, roomWithAnswer);
       // Code for creating SDP answer above
@@ -101,6 +109,9 @@ export class MeetPanelComponent implements OnInit {
         });
       });
       // Listening for remote ICE candidates above
+    } else {
+      alert("Invalid meeeting.");
+      document.location.replace('/');
     }
   }
 
@@ -130,7 +141,6 @@ export class MeetPanelComponent implements OnInit {
         audio: true
       });
       this.localStream = stream;
-      this.remoteStream = new MediaStream();
       meetingId ? this.joinRoomById(meetingId) : this.createRoom();
     } catch(err: any) {
       if (err.name === "NotAllowedError") {
@@ -143,8 +153,12 @@ export class MeetPanelComponent implements OnInit {
   async leave() {
     const localTracks = this.localStream && this.localStream.getTracks();
     (localTracks || []).forEach((track: any) => track.stop());
-    const remoteTracks = this.remoteStream && this.remoteStream.getTracks();
-    (remoteTracks || []).forEach((track: any) => track.stop());
+    this.remoteStream.map((stream: any) => {
+      const remoteTracks = stream && stream.getTracks();
+      (remoteTracks || []).forEach((track: any) => track.stop());
+    });
+    // const remoteTracks = this.remoteStream && this.remoteStream.getTracks();
+    // (remoteTracks || []).forEach((track: any) => track.stop());
     this.peerConnection && this.peerConnection.close();
   
     // Delete room on hangup
@@ -204,18 +218,28 @@ export class MeetPanelComponent implements OnInit {
   
     this.peerConnection.addEventListener('track', (event: any) => {
       console.log('Got remote track:', event.streams[0]);
-      event.streams[0].getTracks().forEach((track: any) => {
-        this.remoteStream.addTrack(track);
+      console.log('Got remote track11:', event.streams);
+      this.remoteStream = (event.streams || []).map((stream: any) => {
+        const rmStream = new MediaStream();
+        stream.getTracks().forEach((track: any) => {
+          rmStream.addTrack(track);
+        });
+        return rmStream;
       });
+
+      // event.streams[0].getTracks().forEach((track: any) => {
+      //   this.remoteStream.addTrack(track);
+      // });
     });
   
     // Listening for remote session description below
     onSnapshot(roomRef, async (snapshot: any) => {
       const data = snapshot.data();
-      if (!this.peerConnection.currentRemoteDescription && data && data.answer) {
-        console.log('Got remote description: ', data.answer);
-        const rtcSessionDescription = new RTCSessionDescription(data.answer);
-        await this.peerConnection.setRemoteDescription(rtcSessionDescription);
+      if (!this.peerConnection.currentRemoteDescription) {
+        (data?.answer || []).map(async (answer: any) => {
+          const rtcSessionDescription = new RTCSessionDescription(answer);
+          await this.peerConnection.setRemoteDescription(rtcSessionDescription);
+        });
       }
     });
     // Listening for remote session description above
