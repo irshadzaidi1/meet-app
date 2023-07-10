@@ -35,19 +35,35 @@
             </button>
         </div>
         <div class="call-actions">
-            <button mat-fab color="white">
-                <i class="fa-solid fa-microphone fa-xl" style="color: #000;"></i>
+            <button
+                mat-fab
+                color="white"
+                matTooltipPosition="above"
+                [matTooltip]="isLocalMicOn ? 'Mic Off' : 'Mic On'"
+                (click)="toggleLocalMic()"
+            >
+                <i [ngClass]="{ 'fa-microphone': isLocalMicOn, 'fa-microphone-slash': !isLocalMicOn }" class="fa-solid fa-xl" style="color: #000;"></i>
+            </button>
+            <button
+                mat-fab color="white"
+                matTooltipPosition="above"
+                [matTooltip]="isLocalCamOn ? 'Video Off' : 'Video On'"
+                (click)="toggleLocalVideo()"
+            >
+                <i [ngClass]="{ 'fa-video': isLocalCamOn, 'fa-video-slash': !isLocalCamOn }" class="fa-solid fa-xl" style="color: #000;"></i>
             </button>
             <button mat-fab color="white">
-            <i class="fa-solid fa-video fa-xl" style="color: #000;"></i>
-        </button>
-        <button mat-fab color="white">
-            <i class="fa-solid fa-arrow-up-from-bracket fa-xl" style="color: #000;"></i>
-        </button>
-        <button mat-fab color="warn" (click)="leave()">
-            <i class="fa-solid fa-phone-slash fa-xl" style="color: fff;"></i>
-        </button>
-        </div>
+                <i class="fa-solid fa-arrow-up-from-bracket fa-xl" style="color: #000;"></i>
+            </button>
+            <button
+                mat-fab color="warn"
+                matTooltipPosition="above"
+                matTooltip="End Confrence"
+                (click)="leave()"
+            >
+                <i class="fa-solid fa-phone-slash fa-xl" style="color: fff;"></i>
+            </button>
+            </div>
         <div class="members-info">
             <button mat-fab color="white">
                 <i class="fa-solid fa-users fa-xl" style="color: #000;"></i>

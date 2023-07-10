@@ -11,6 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class MeetPanelComponent implements OnInit {
   meetingCode: string = '';
+  isLocalCamOn: boolean = true;
+  isLocalMicOn: boolean = true;
 
 
   item$?: Observable<any[]>;
@@ -287,6 +289,18 @@ export class MeetPanelComponent implements OnInit {
 
   showMeetingInfo() {
     document.getElementById("meetingInfoBtn")?.click();
+  }
+
+  toggleLocalVideo() {
+    const localVideoTrack = this.localStream.getTracks().find((track: any) => track.kind === 'video');
+    localVideoTrack.enabled = !localVideoTrack.enabled;
+    this.isLocalCamOn = localVideoTrack.enabled;
+  }
+
+  toggleLocalMic() {
+    const localMicTrack = this.localStream.getTracks().find((track: any) => track.kind === 'audio');
+    localMicTrack.enabled = !localMicTrack.enabled;
+    this.isLocalMicOn = localMicTrack.enabled;
   }
 
   get getMeetingLink() {
