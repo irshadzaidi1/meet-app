@@ -6,7 +6,7 @@
         align-items: center;
         height: 85%;
         background-color: rgb(32,33,36);
-        .local-video,
+        overflow: auto;
         .remote-video {
             border: 2px solid #ccc;
             height: 100%;
@@ -43,5 +43,11 @@
 ::ng-deep {
     &.mat-menu-panel {
         max-width: none !important;
+    }
+    .username {
+        color: #fff;
+        font-size: 16px;
+        text-align: center;
+        padding: 4px;
     }
 }

@@ -1,37 +1,16 @@
-<!-- <div class="home-conatainer">
-    <h2>Video calls and meetings for everyone.</h2>
-    <div class="action-container">
-        <button class="new-meeting-btn" (click)="createRoom()">New Meeting</button>
-        <input class="join-meeting-input" type="text" placeholder="Enter meeting code" (change)="handleMeetingCodeChange($event)" />
-        <button class="join-meeting-btn" (click)="joinRoomById(meetingId)">Join</button>
-        <button class="hangup-btn" (click)="leave()">Leave</button>
-    </div>
-    <div class="videos-container">
-        <div>
-            <p>Local Stream</p>
-            <video [muted]="isMuted" class="local-video" muted autoplay playsinline [srcObject]="localStream"></video>
-            <div>
-                <button (click)="isMuted = !isMuted">{{isMuted ? 'Unmute' : 'Mute'}}</button>
-            </div>
-        </div>
-        <div>
-            <p>Remote Stream</p>
-            <video class="remote-video" autoplay playsinline [srcObject]="remoteStream"></video>
-        </div>
-    </div>
-</div>
- -->
 <div class="meet-panel-container">
     <div class="video-container">
-        <video class="local-video" autoplay playsinline [srcObject]="localStream"></video>
-        <ng-container *ngFor="let stream of remoteStream">
+        <!-- <ng-container *ngFor="let stream of streams">
             <video class="remote-video" autoplay playsinline [srcObject]="stream"></video>
-        </ng-container>
+        </ng-container> -->
+        <div id="remote_videos">
+            <div class="videos-inner"></div>
+        </div>
     </div>
     <div class="action-container">
         <div class="meet-info">
             <button mat-fab color="white" [matMenuTriggerFor]="meetingInfoMenu" id="meetingInfoBtn">
-                <i class="fa-solid fa-circle-info fa-2xl" style="color: #000;"></i>
+                <i id="meetingInfoBtn" [matMenuTriggerFor]="meetingInfoMenu" class="fa-solid fa-circle-info fa-2xl" style="color: #000;"></i>
             </button>
         </div>
         <div class="call-actions">
@@ -45,18 +24,17 @@
                 <i [ngClass]="{ 'fa-microphone': isLocalMicOn, 'fa-microphone-slash': !isLocalMicOn }" class="fa-solid fa-xl" style="color: #000;"></i>
             </button>
             <button
-                mat-fab color="white"
+                mat-fab
+                color="white"
                 matTooltipPosition="above"
                 [matTooltip]="isLocalCamOn ? 'Video Off' : 'Video On'"
                 (click)="toggleLocalVideo()"
             >
                 <i [ngClass]="{ 'fa-video': isLocalCamOn, 'fa-video-slash': !isLocalCamOn }" class="fa-solid fa-xl" style="color: #000;"></i>
             </button>
-            <button mat-fab color="white">
-                <i class="fa-solid fa-arrow-up-from-bracket fa-xl" style="color: #000;"></i>
-            </button>
             <button
-                mat-fab color="warn"
+                mat-fab
+                color="warn"
                 matTooltipPosition="above"
                 matTooltip="End Confrence"
                 (click)="leave()"
